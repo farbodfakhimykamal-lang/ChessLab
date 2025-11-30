@@ -863,11 +863,10 @@ document.querySelector('#save').onclick = () => {
     console.log(result);
     
     let fileContent = result;
-    fileContent = fileContent.split("&");
+    fileContent += "&";
+    fileContent += JSON.stringify(gameFlowMovesRaw, null, 2);
     
-    fileContent.forEach((e, i) => {
-      document.querySelector("#file-loading-page").innerHTML += `<div class="gameListnew">${i + 1} ${e}</div>`;
-    });
+    saveFile(fileContent);
   });
   
   document.querySelector(".gameFlowInput").value = JSON.stringify(gameFlowMovesRaw, null, 2);
@@ -879,14 +878,16 @@ document.querySelector('#saved-games').onclick = () => {
   //gameFlow();
   
   (readFile()).then((result) => {
-    console.log(result);
+    //console.log(result);
     
     let fileContent = result;
     fileContent = fileContent.split("&");
     
     fileContent.forEach((e, i) => {
-      document.querySelector("#file-loading-page").innerHTML += `<div class="gameListnew">${i + 1} ${e}</div>`;
+      document.querySelector("#file-loading-page").innerHTML += `<div id="listElement${i+1}" class="gameListnew">${i + 1} ${e}</div>`;
+      document.querySelector("#listElement" + String(i + 1)).onclick = () => gameLoading(e); 
     });
+    
   });
   
   /*for(let i=0; i<20; i++){
@@ -995,6 +996,17 @@ document.querySelector('.back').onclick = () => {
         
     }
   }
+}
+
+function gameLoading(gameJSON){
+  let gameString = JSON.parse(gameJSON);
+  
+  gameString.forEach(e => {
+    gameFlowAutomation(e);
+  });
+  
+  document.querySelector("#file-loading-page").style.display = "none";
+  document.querySelector("#file-loading-page").innerHTML = "";
 }
 
 function castleBackHandle(info){
@@ -1177,9 +1189,10 @@ async function readFile() {
     else alert("Error: " + data.error);
 }
 
-async function saveFile() {
-    const path = document.getElementById("filepath").value;
-    const content = document.getElementById("content").value;
+async function saveFile(content) {
+    const path = "/storage/emulated/0/Download/text.txt";
+    //const path = document.getElementById("filepath").value;
+    //const content = document.getElementById("content").value;
     const res = await fetch("/write", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1189,3 +1202,4 @@ async function saveFile() {
     if (data.success) alert("Saved 🤗💛");
     else alert("Error: " + data.error);
 }
+

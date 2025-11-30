@@ -5,227 +5,228 @@
 <script type="module" src="./classes/king.js"></script>
 <script type="module" src="./classes/knight.js"></script>-->
 <head>
-  <style>
-    body{
-      padding: 0;
-      background-color: lightgray;
-    }
-    
-    .grid{
-      margin: 0;
-      border: 3px solid black;
-      display: grid;
-      padding: 1px;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-      column-gap: 1px;
-      row-gap: 1px;
-      width: 100%;
-    }
-    .a00{
-      color: pink;
-    }
-    
-    .gameList{
-      position: relative;
-      background-color: lightgray;
-      height: 30px;
-      margin-bottom: 20px;
-    }
-    
-    .gameListnew{
-      position: relative;
-      background-color: lightgray;
-      height: 30px;
-      margin-bottom: 20px;
-    }
-    
-    .round{
-      border-radius: 5px;
-    }
-    
-    .black{
-      background-color: hsl(30.7,77.2%,20.9%);
-      margin: 0;
-    }
-    
-    .file-loading-page{
-      display: none;
-      padding: 10px;
-      flex-direction: column;
-      justify-content: start;
-      position: fixed;
-      position: absolute;
-      top: 80px;
-      bottom: 80px;
-      left: 20px;
-      right: 20px;
-      background-color: gray;
-      overflow-y: auto;
-      border-radius: 5px;
-      border: solid 2px black;
-    }
-    
-    .control-container{
-      background-color: hsl(30.7,14.9%,71.1%);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      padding: 10px;
-    }
-    
-    .white{
-      background-color: hsl(30.7,28.2%,60.9%);
-      margin: 0;
-    }
-    
-    .input{
-      
-      
-      background-color: hsl(30.7,66.5%,81.6%);
-      font-family: Sans-Serif;
-      font-size: 15px;
-      font-weight: bold;
-      border: none;
-    }
-    
-    .inputt{
-      
-      background-color: hsl(30.7,66.5%,81.6%);
-      font-family: Sans-Serif;
-      font-size: 15px;
-      font-weight: bold;
-      border: none;
-    }
-    
-    .run{
-      background-color: hsl(30.7,66.5%,81.6%);
-      font-family: Sans-Serif;
-      font-size: 15px;
-      font-weight: bold;
-      border: none;
-      margin-top: 20px;
-      margin-bottom: 20px;
-    }
-    
-    .back{
-      background-color: hsl(30.7,66.5%,81.6%);
-      font-family: Sans-Serif;
-      font-size: 20px;
-      font-weight: bold;
-      border: none;
-    }
-    
-    .gameFlowInput{
-      background-color: hsl(30.7,66.5%,81.6%);
-      font-family: Sans-Serif;
-      font-size: 20px;
-      font-weight: bold;
-      border: none;
-    }
-    
-    .image{
-      width: 44px;
-      height: 44px;
-    }
-    
-    
-  </style>
+<style>
+body{
+  padding: 0;
+  background-color: lightgray;
+}
+
+.grid{
+  margin: 0;
+  border: 3px solid black;
+  display: grid;
+  padding: 1px;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  column-gap: 1px;
+  row-gap: 1px;
+  width: 100%;
+}
+.a00{
+  color: pink;
+}
+
+.gameList{
+  position: relative;
+  background-color: lightgray;
+  height: 30px;
+  margin-bottom: 20px;
+}
+
+.gameListnew{
+  position: relative;
+  background-color: lightgray;
+  height: 30px;
+  margin-bottom: 20px;
+}
+
+.round{
+  border-radius: 5px;
+}
+
+.black{
+  background-color: hsl(30.7,77.2%,20.9%);
+  margin: 0;
+}
+
+.file-loading-page{
+  display: none;
+  padding: 10px;
+  flex-direction: column;
+  justify-content: start;
+  position: fixed;
+  position: absolute;
+  top: 80px;
+  bottom: 80px;
+  left: 20px;
+  right: 20px;
+  background-color: gray;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 5px;
+  border: solid 2px black;
+}
+
+.control-container{
+  background-color: hsl(30.7,14.9%,71.1%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+.white{
+  background-color: hsl(30.7,28.2%,60.9%);
+  margin: 0;
+}
+
+.input{
+  
+  
+  background-color: hsl(30.7,66.5%,81.6%);
+  font-family: Sans-Serif;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+}
+
+.inputt{
+  
+  background-color: hsl(30.7,66.5%,81.6%);
+  font-family: Sans-Serif;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+}
+
+.run{
+  background-color: hsl(30.7,66.5%,81.6%);
+  font-family: Sans-Serif;
+  font-size: 15px;
+  font-weight: bold;
+  border: none;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.back{
+  background-color: hsl(30.7,66.5%,81.6%);
+  font-family: Sans-Serif;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+}
+
+.gameFlowInput{
+  background-color: hsl(30.7,66.5%,81.6%);
+  font-family: Sans-Serif;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+}
+
+.image{
+  width: 44px;
+  height: 44px;
+}
+
+
+</style>
 </head>
 <div id="file-loading-page" class="file-loading-page">
-  <div class="gameList">
-    list
-  </div>
+<div class="gameList">
+list
+</div>
 </div>
 <div class="control-container round">
-  <input class="gameFlowInput round" type="text"/>
-  <button class="run round">run</button>
-  <button class="back round">←</button>
+<input class="gameFlowInput round" type="text"/>
+<button class="run round">run</button>
+<button class="back round">←</button>
 </div>
 <!--<input class="input" type="text"/>-->
 <div class="control-container round">
-  <button id="populate" class="input round">populate</button>
-  <button id="saved-games" class="input round">saved games</button>
-  <button id="save" class="inputt round">save</button>
+<button id="populate" class="input round">populate</button>
+<button id="saved-games" class="input round">saved games</button>
+<button id="save" class="inputt round">save</button>
 </div>
 <div class="grid">
-  <div id="a00" class="white"></div>
-  <div id="a01" class="black a01">a</div>
-  <div id="a02" class="white a02"></div>
-  <div id="a03" class="black a03"></div>
-  <div id="a04" class="white a04"></div>
-  <div id="a05" class="black a05"></div>
-  <div id="a06" class="white a06"></div>
-  <div id="a07" class="black a07"></div>
-  
-  <div id="a10" class="black a10"></div>
-  <div id="a11" class="white a11"></div>
-  <div id="a12" class="black a12"></div>
-  <div id="a13" class="white a13"></div>
-  <div id="a14" class="black a14"></div>
-  <div id="a15"class="white a15"></div>
-  <div id="a16" class="black a16"></div>
-  <div id="a17" class="white a17"></div>
-  
-  <div id="a20" class="white a20"></div>
-  <div id="a21" class="black a21"></div>
-  <div id="a22" class="white a22"></div>
-  <div id="a23" class="black a23"></div>
-  <div id="a24" class="white a24"></div>
-  <div id="a25" class="black a25"></div>
-  <div id="a26" class="white a26"></div>
-  <div id="a27" class="black a27"></div>
-  
-  <div id="a30" class="black a30"></div>
-  <div id="a31" class="white a31"></div>
-  <div id="a32" class="black a32"></div>
-  <div id="a33" class="white a33"></div>
-  <div id="a34" class="black a34"></div>
-  <div id="a35" class="white a35"></div>
-  <div id="a36" class="black a36"></div>
-  <div id="a37" class="white a37"></div>
-  
-  <div id="a40" class="white a40"></div>
-  <div id="a41" class="black a41"></div>
-  <div id="a42" class="white a42"></div>
-  <div id="a43" class="black a43"></div>
-  <div id="a44" class="white a44"></div>
-  <div id="a45" class="black a45"></div>
-  <div id="a46" class="white a46"></div>
-  <div id="a47" class="black a47"></div>
-  
-  <div id="a50" class="black a50"></div>
-  <div id="a51" class="white a51"></div>
-  <div id="a52" class="black a52"></div>
-  <div id="a53" class="white a53"></div>
-  <div id="a54" class="black a54"></div>
-  <div id="a55" class="white a55"></div>
-  <div id="a56" class="black a56"></div>
-  <div id="a57" class="white a57"></div>
-  
-  <div id="a60" class="white a60"></div>
-  <div id="a61" class="black a61"></div>
-  <div id="a62" class="white a62"></div>
-  <div id="a63" class="black a63"></div>
-  <div id="a64" class="white a64"></div>
-  <div id="a65" class="black a65"></div>
-  <div id="a66" class="white a66"></div>
-  <div id="a67" class="black a67"></div>
-  
-  <div id="a70" class="black a70"></div>
-  <div id="a71" class="white a71"></div>
-  <div id="a72" class="black a72">
-    <img src="./knightW.jpg" class="image"/>
-  </div>
-  <div id="a73" class="white a73"></div>
-  <div id="a74" class="black a74"></div>
-  <div id="a75" class="white a75">
-    <img src="./knight.jpg" class="image"/>
-  </div>
-  <div id="a76" class="black a76"></div>
-  <div id="a77" class="white a77"></div>
-  
+<div id="a00" class="white"></div>
+<div id="a01" class="black a01">a</div>
+<div id="a02" class="white a02"></div>
+<div id="a03" class="black a03"></div>
+<div id="a04" class="white a04"></div>
+<div id="a05" class="black a05"></div>
+<div id="a06" class="white a06"></div>
+<div id="a07" class="black a07"></div>
+
+<div id="a10" class="black a10"></div>
+<div id="a11" class="white a11"></div>
+<div id="a12" class="black a12"></div>
+<div id="a13" class="white a13"></div>
+<div id="a14" class="black a14"></div>
+<div id="a15"class="white a15"></div>
+<div id="a16" class="black a16"></div>
+<div id="a17" class="white a17"></div>
+
+<div id="a20" class="white a20"></div>
+<div id="a21" class="black a21"></div>
+<div id="a22" class="white a22"></div>
+<div id="a23" class="black a23"></div>
+<div id="a24" class="white a24"></div>
+<div id="a25" class="black a25"></div>
+<div id="a26" class="white a26"></div>
+<div id="a27" class="black a27"></div>
+
+<div id="a30" class="black a30"></div>
+<div id="a31" class="white a31"></div>
+<div id="a32" class="black a32"></div>
+<div id="a33" class="white a33"></div>
+<div id="a34" class="black a34"></div>
+<div id="a35" class="white a35"></div>
+<div id="a36" class="black a36"></div>
+<div id="a37" class="white a37"></div>
+
+<div id="a40" class="white a40"></div>
+<div id="a41" class="black a41"></div>
+<div id="a42" class="white a42"></div>
+<div id="a43" class="black a43"></div>
+<div id="a44" class="white a44"></div>
+<div id="a45" class="black a45"></div>
+<div id="a46" class="white a46"></div>
+<div id="a47" class="black a47"></div>
+
+<div id="a50" class="black a50"></div>
+<div id="a51" class="white a51"></div>
+<div id="a52" class="black a52"></div>
+<div id="a53" class="white a53"></div>
+<div id="a54" class="black a54"></div>
+<div id="a55" class="white a55"></div>
+<div id="a56" class="black a56"></div>
+<div id="a57" class="white a57"></div>
+
+<div id="a60" class="white a60"></div>
+<div id="a61" class="black a61"></div>
+<div id="a62" class="white a62"></div>
+<div id="a63" class="black a63"></div>
+<div id="a64" class="white a64"></div>
+<div id="a65" class="black a65"></div>
+<div id="a66" class="white a66"></div>
+<div id="a67" class="black a67"></div>
+
+<div id="a70" class="black a70"></div>
+<div id="a71" class="white a71"></div>
+<div id="a72" class="black a72">
+<img src="./knightW.jpg" class="image"/>
+</div>
+<div id="a73" class="white a73"></div>
+<div id="a74" class="black a74"></div>
+<div id="a75" class="white a75">
+<img src="./knight.jpg" class="image"/>
+</div>
+<div id="a76" class="black a76"></div>
+<div id="a77" class="white a77"></div>
+
 </div>
 
 <script type="module" src="chess.js"></script>
