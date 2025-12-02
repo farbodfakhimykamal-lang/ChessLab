@@ -863,10 +863,23 @@ document.querySelector('#save').onclick = () => {
     console.log(result);
     
     let fileContent = result;
-    fileContent += "&";
-    fileContent += JSON.stringify(gameFlowMovesRaw, null, 2);
-    
-    saveFile(fileContent);
+    if(result !== ""){
+      fileContent += "&";
+      fileContent += JSON.stringify(gameFlowMovesRaw, null, 2);
+      fileContent += "@";
+      const d = new Date();
+      fileContent += `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}  ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+      
+      saveFile(fileContent);
+    }
+    else{
+      fileContent += JSON.stringify(gameFlowMovesRaw, null, 2);
+      fileContent += "@";
+      const d = new Date();
+      fileContent += `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}  ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+      
+      saveFile(fileContent);
+    }
   });
   
   document.querySelector(".gameFlowInput").value = JSON.stringify(gameFlowMovesRaw, null, 2);
@@ -881,12 +894,22 @@ document.querySelector('#saved-games').onclick = () => {
     //console.log(result);
     
     let fileContent = result;
-    fileContent = fileContent.split("&");
-    
-    fileContent.forEach((e, i) => {
-      document.querySelector("#file-loading-page").innerHTML += `<div id="listElement${i+1}" class="gameListnew">${i + 1} ${e}</div>`;
-      document.querySelector("#listElement" + String(i + 1)).onclick = () => gameLoading(e); 
-    });
+    if(fileContent === ""){
+      console.log("none");
+    }
+    else{
+      console.log(fileContent);
+      fileContent = fileContent.split("&");
+      fileContent = fileContent.map((e) => {
+        return e.split("@");
+      })
+      
+      fileContent.forEach((e, i) => {
+        document.querySelector("#file-loading-page").innerHTML += `<div id="listElement${i+1}" class="gameListnew">${i + 1})${e[1]} ${e[0]}</div>`;
+        document.querySelector("#listElement" + String(i + 1)).onclick = () => gameLoading(e[0]); 
+      });
+      document.querySelector("#file-loading-page").style.display = "flex";
+    }
     
   });
   
@@ -895,7 +918,6 @@ document.querySelector('#saved-games').onclick = () => {
    
   }*/
   
-  document.querySelector("#file-loading-page").style.display = "flex";
 }
 
 document.querySelector('.run').onclick = () => {
@@ -1113,22 +1135,22 @@ function  htmlBoardImageAdjuster(grid, jsPieceGrid){
       else{
         switch((jsPieceGrid[i][j]).constructor.name){
           case "king":
-            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-king.png" style="height:44px;width:44px;" />`;
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-king.png" style="height: 11vw;width: 11vw;" />`;
             break;
           case "queen":
-            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-queen.png" style="height:44px;width:44px;" />`;
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-queen.png" style="height: 11vw;width: 11vw;" />`;
             break;
           case "knight":
-            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-knight.png" style="height:44px;width:44px;" />`;
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-knight.png" style="height: 11vw;width: 11vw;" />`;
             break;
           case "bishop":
-            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-bishop.png" style="height:44px;width:44px;" />`;
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-bishop.png" style="height: 11vw;width: 11vw;" />`;
             break;
           case "rook":
-            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-rook.png" style="height:44px;width:44px;" />`;
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-rook.png" style="height: 11vw;width: 11vw;" />`;
             break;
           case "pawn":
-            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-pawn.png" style="height:44px;width:44px;" />`;
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[i][j]).color}-pawn.png" style="height: 11vw;width: 11vw;" />`;
             break;
         }
       }
@@ -1178,7 +1200,7 @@ htmlBoardClickHook(htmlGrid);
 //(htmlGrid[3][4]).style.backgroundColor = "pink";
 
 async function readFile() {
-    const path = "/storage/emulated/0/Download/text.txt";
+    const path = "./text.txt";
     const res = await fetch("/read", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1190,7 +1212,7 @@ async function readFile() {
 }
 
 async function saveFile(content) {
-    const path = "/storage/emulated/0/Download/text.txt";
+    const path = "./text.txt";
     //const path = document.getElementById("filepath").value;
     //const content = document.getElementById("content").value;
     const res = await fetch("/write", {
@@ -1203,3 +1225,6 @@ async function saveFile(content) {
     else alert("Error: " + data.error);
 }
 
+const d = new Date();
+console.log(d.getFullYear());
+console.log(`${d.getFullYear()}-${d.getMonth()}-${d.getDay()}  ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`);
