@@ -1228,3 +1228,16 @@ async function saveFile(content) {
 const d = new Date();
 console.log(d.getFullYear());
 console.log(`${d.getFullYear()}-${d.getMonth()}-${d.getDay()}  ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`);
+
+class gameTree{
+    constructor(){
+      this.numberOfNodes = 0;
+        this.allNodes = [];
+        this.begginingNode = null;
+    }
+    
+    function addNode(value){
+      
+    }
+    
+}
