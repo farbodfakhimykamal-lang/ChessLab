@@ -1229,15 +1229,98 @@ const d = new Date();
 console.log(d.getFullYear());
 console.log(`${d.getFullYear()}-${d.getMonth()}-${d.getDay()}  ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`);
 
+
+
+
 class gameTree{
     constructor(){
-      this.numberOfNodes = 0;
         this.allNodes = [];
-        this.begginingNode = null;
     }
     
-    function addNode(value){
+    addNode(value, parentIndex){
+      if ((this.allNodes).length === 0){
+        let newNode = {
+          parent: -1,
+          key: value,
+          children: []
+        };
+        
+        (this.allNodes).push(newNode);
+      }
+      else{
+        if((0 <= parentIndex) 
+        && (parentIndex <= this.allNodes.length)){
+          
+          let newNode = {
+          parent: parentIndex,
+          key: value,
+          children: []
+          };
+          
+          this.allNodes.push(newNode);
+          
+          (this.allNodes[parentIndex]).children.push(this.allNodes.length - 1);
+        }
+      }
+    }
+    
+    printAllNodes(){
       
     }
     
+    /*returnAllPaths(index){
+      let current = (this.allNodes[index]);
+      
+      if(current.children.length === 0){
+        return `${current.key}`;
+      }
+      else{
+        for(let i=0; i<current.children.length; i++){
+          return `${current.key}, ${this.returnAllPaths(current.children[i])}`;
+        }
+      }
+    }*/
+    
+    returnAllPaths(index){
+      let allPaths = [];
+      let leaves = [];
+      this.allNodes.forEach((e, i) => {
+        if(e.children.length === 0){
+          leaves.push(i);
+        }
+      });
+      
+      for(let i=0; i<leaves.length; i++){
+        allPaths.push(this.pathToRoot(leaves[i]));
+      }
+      
+      return allPaths;
+    }
+    
+    pathToRoot(index){
+      if((this.allNodes[index]).parent === -1){
+        return `${(this.allNodes[index]).key}`;
+      }
+      else{
+        return `${(this.allNodes[index]).key},${this.pathToRoot((this.allNodes[index]).parent)}`
+      }
+    }
+    
 }
+
+let tree = new gameTree();
+tree.addNode(1, 0);
+tree.addNode(2, 0);
+tree.addNode(3, 0);
+tree.addNode(4, 0);
+tree.addNode(5, 3);
+tree.addNode(6, 2);
+tree.addNode(7, 3);
+tree.addNode(8, 3);
+tree.addNode(9, 3);
+console.log(tree.returnAllPaths(0));
+
+/*1
+2       3       4
+        6     5 7 8 9
+*/
