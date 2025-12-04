@@ -1235,6 +1235,7 @@ console.log(`${d.getFullYear()}-${d.getMonth()}-${d.getDay()}  ${d.getHours()}:$
 class gameTree{
     constructor(){
         this.allNodes = [];
+        this.allPathsOrdered = [];
     }
     
     addNode(value, parentIndex){
@@ -1281,7 +1282,7 @@ class gameTree{
       }
     }*/
     
-    returnAllPaths(index){
+    /*returnAllPaths(index){
       let allPaths = [];
       let leaves = [];
       this.allNodes.forEach((e, i) => {
@@ -1295,17 +1296,31 @@ class gameTree{
       }
       
       return allPaths;
-    }
+    }*/
     
     pathToRoot(index){
       if((this.allNodes[index]).parent === -1){
         return `${(this.allNodes[index]).key}`;
       }
       else{
-        return `${(this.allNodes[index]).key},${this.pathToRoot((this.allNodes[index]).parent)}`
+        return `${this.pathToRoot((this.allNodes[index]).parent)},${(this.allNodes[index]).key}`
       }
     }
     
+    
+    returnAllPathsOrdered(index, pastNodes = ""){
+      if(index <= this.allNodes.length){
+        let currentNode = this.allNodes[index];
+        if(currentNode.children.length === 0){
+          this.allPathsOrdered.push(`${pastNodes},${currentNode.key}`);
+        }
+        else{
+          currentNode.children.forEach(e => {
+            this.returnAllPathsOrdered(e, `${pastNodes === "" ? "" : pastNodes + ","}${currentNode.key}`);
+          });
+        }
+      }
+    }
 }
 
 let tree = new gameTree();
@@ -1318,7 +1333,11 @@ tree.addNode(6, 2);
 tree.addNode(7, 3);
 tree.addNode(8, 3);
 tree.addNode(9, 3);
-console.log(tree.returnAllPaths(0));
+//console.log(tree.returnAllPaths(0));
+tree.returnAllPathsOrdered(0);
+console.log(tree.allPathsOrdered);
+console.log(tree.pathToRoot(8));
+
 
 /*1
 2       3       4
