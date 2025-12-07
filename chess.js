@@ -4,6 +4,146 @@ import { bishop } from "./classes/bishop.js";
 import { king } from "./classes/king.js";
 import { knight } from "./classes/knight.js";
 import { pawn } from "./classes/pawn.js";
+class gameTree{
+    constructor(){
+        this.allNodes = [];
+        this.allPathsOrdered = [];
+        this.allNodesDepthOrganized = [];
+        this.maxNodeExtractor = [];
+        this.writeCurser = {lastNodeIndex: 0};
+    }
+    
+    addNode(value, parentIndex){
+      if ((this.allNodes).length === 0){
+        let newNode = {
+          parent: -1,
+          key: value,
+          children: []
+        };
+        
+        (this.allNodes).push(newNode);
+      }
+      else{
+        if((0 <= parentIndex) 
+        && (parentIndex <= this.allNodes.length)){
+          
+          let newNode = {
+          parent: parentIndex,
+          key: value,
+          children: []
+          };
+          
+          this.allNodes.push(newNode);
+          
+          (this.allNodes[parentIndex]).children.push(this.allNodes.length - 1);
+          
+          this.writeCurser.lastNodeIndex = this.allNodes.length - 1;
+          this.allPathsOrdered = [];
+        }
+      }
+    }
+    
+    printAllNodes(){
+      
+    }
+    
+    /*returnAllPaths(index){
+      let current = (this.allNodes[index]);
+      
+      if(current.children.length === 0){
+        return `${current.key}`;
+      }
+      else{
+        for(let i=0; i<current.children.length; i++){
+          return `${current.key}, ${this.returnAllPaths(current.children[i])}`;
+        }
+      }
+    }*/
+    
+    /*returnAllPaths(index){
+      let allPaths = [];
+      let leaves = [];
+      this.allNodes.forEach((e, i) => {
+        if(e.children.length === 0){
+          leaves.push(i);
+        }
+      });
+      
+      for(let i=0; i<leaves.length; i++){
+        allPaths.push(this.pathToRoot(leaves[i]));
+      }
+      
+      return allPaths;
+    }*/
+    
+    pathToRoot(index){
+      if((this.allNodes[index]).parent === -1){
+        return `${(this.allNodes[index]).key}`;
+      }
+      else{
+        return `${this.pathToRoot((this.allNodes[index]).parent)},${(this.allNodes[index]).key}`
+      }
+    }
+    
+    
+    returnAllPathsOrdered(index = 0, pastNodes = ""){
+      if(index <= this.allNodes.length){
+        let currentNode = this.allNodes[index];
+        if(currentNode.children.length === 0){
+          this.allPathsOrdered.push(`${pastNodes === "" ? "[" : pastNodes + ","}"${currentNode.key}"]`);
+        }
+        else{
+          currentNode.children.forEach(e => {
+            this.returnAllPathsOrdered(e, `${pastNodes === "" ? "[" : pastNodes + ","}"${currentNode.key}"`);
+          });
+        }
+      }
+    }
+    
+    findHeights(index = 0, pastNodes = 0){
+      if(index <= this.allNodes.length){
+        let currentNode = this.allNodes[index];
+        if(currentNode.children.length === 0){
+          this.maxNodeExtractor.push(pastNodes + 1);
+        }
+        else{
+          currentNode.children.forEach(e => {
+            this.findHeights(e, pastNodes + 1);
+          });
+        }
+      }
+    }
+    
+    findMaxDepth(){
+      this.maxNodeExtractor = [];
+      this.findHeights();
+      
+      let maxDepth = 0;
+      this.maxNodeExtractor.forEach(e => {
+        if(e > maxDepth) maxDepth = e;
+      });
+      return maxDepth;
+    }
+    
+    bundle(){
+      for(let i=0; i<this.findMaxDepth(); i++){
+        this.allNodesDepthOrganized.push([]);
+      }
+      
+      this.depthOrganizer();
+    }
+    
+    depthOrganizer(index = 0, pastNodes = 0){
+      if(index <= this.allNodes.length){
+        let currentNode = this.allNodes[index];
+        (this.allNodesDepthOrganized[pastNodes]).push(currentNode);
+        currentNode.children.forEach(e => {
+          this.depthOrganizer(e, pastNodes + 1);
+        });
+      }
+      
+    }
+}
 
 let displayGrid = [
   ["r", "k", "b", "l", "q", "b", "k", "r"],
@@ -556,6 +696,7 @@ console.log(namename);*/
 let gameFlowMoves = [];
 let gameFlowMovesRaw = [];
 let gameFlowMovesReversable = [];
+let mainGameTree = new gameTree();
                     
 let gameFlowMovesAutomation = [
                       "1 3 2 3",
@@ -757,6 +898,7 @@ function gameFlowAutomation(inputt){
         input.push(turn);
         gameFlowMoves.push(input);
         gameFlowMovesRaw.push(inputt);
+        mainGameTree.addNode(inputt, mainGameTree.writeCurser.lastNodeIndex);
         
         if(isOpen(pieceGrid, input[2], input[3])){
           if((pieceGrid[input[0]][input[1]]).constructor.name === "pawn"){
@@ -799,6 +941,14 @@ function gameFlowAutomation(inputt){
           
           (pieceGrid[black.x][black.y]).hasBeenChecked = true;
         }
+        
+        //mainGameTree.printAllNodes();
+        mainGameTree.returnAllPathsOrdered();
+        console.log(mainGameTree.allPathsOrdered);
+        /*let test = JSON.parse(mainGameTree.allPathsOrdered[0]);
+        console.log(test[0]);*/
+        
+        
         //gameEnded(turn);
         //console.log(pieceGrid);
         //console.log(gameFlowMoves);
@@ -954,6 +1104,7 @@ document.querySelector('.back').onclick = () => {
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
         gameFlowMoves.splice(l, 1);
+        mainGameTree.writeCurser.lastNodeIndex = (mainGameTree.allNodes[mainGameTree.writeCurser.lastNodeIndex]).parent;
         
         boardDisplayUpdator();
         printBoard();
@@ -968,6 +1119,7 @@ document.querySelector('.back').onclick = () => {
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
         gameFlowMoves.splice(l, 1);
+        mainGameTree.writeCurser.lastNodeIndex = (mainGameTree.allNodes[mainGameTree.writeCurser.lastNodeIndex]).parent;
         
         boardDisplayUpdator();
         printBoard();
@@ -981,6 +1133,7 @@ document.querySelector('.back').onclick = () => {
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
         gameFlowMoves.splice(l, 1);
+        mainGameTree.writeCurser.lastNodeIndex = (mainGameTree.allNodes[mainGameTree.writeCurser.lastNodeIndex]).parent;
         
         boardDisplayUpdator();
         printBoard();
@@ -995,6 +1148,7 @@ document.querySelector('.back').onclick = () => {
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
         gameFlowMoves.splice(l, 1);
+        mainGameTree.writeCurser.lastNodeIndex = (mainGameTree.allNodes[mainGameTree.writeCurser.lastNodeIndex]).parent;
         
         boardDisplayUpdator();
         printBoard();
@@ -1009,6 +1163,7 @@ document.querySelector('.back').onclick = () => {
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
         gameFlowMoves.splice(l, 1);
+        mainGameTree.writeCurser.lastNodeIndex = (mainGameTree.allNodes[mainGameTree.writeCurser.lastNodeIndex]).parent;
         
         boardDisplayUpdator();
         printBoard();
@@ -1232,96 +1387,7 @@ console.log(`${d.getFullYear()}-${d.getMonth()}-${d.getDay()}  ${d.getHours()}:$
 
 
 
-class gameTree{
-    constructor(){
-        this.allNodes = [];
-        this.allPathsOrdered = [];
-    }
-    
-    addNode(value, parentIndex){
-      if ((this.allNodes).length === 0){
-        let newNode = {
-          parent: -1,
-          key: value,
-          children: []
-        };
-        
-        (this.allNodes).push(newNode);
-      }
-      else{
-        if((0 <= parentIndex) 
-        && (parentIndex <= this.allNodes.length)){
-          
-          let newNode = {
-          parent: parentIndex,
-          key: value,
-          children: []
-          };
-          
-          this.allNodes.push(newNode);
-          
-          (this.allNodes[parentIndex]).children.push(this.allNodes.length - 1);
-        }
-      }
-    }
-    
-    printAllNodes(){
-      
-    }
-    
-    /*returnAllPaths(index){
-      let current = (this.allNodes[index]);
-      
-      if(current.children.length === 0){
-        return `${current.key}`;
-      }
-      else{
-        for(let i=0; i<current.children.length; i++){
-          return `${current.key}, ${this.returnAllPaths(current.children[i])}`;
-        }
-      }
-    }*/
-    
-    /*returnAllPaths(index){
-      let allPaths = [];
-      let leaves = [];
-      this.allNodes.forEach((e, i) => {
-        if(e.children.length === 0){
-          leaves.push(i);
-        }
-      });
-      
-      for(let i=0; i<leaves.length; i++){
-        allPaths.push(this.pathToRoot(leaves[i]));
-      }
-      
-      return allPaths;
-    }*/
-    
-    pathToRoot(index){
-      if((this.allNodes[index]).parent === -1){
-        return `${(this.allNodes[index]).key}`;
-      }
-      else{
-        return `${this.pathToRoot((this.allNodes[index]).parent)},${(this.allNodes[index]).key}`
-      }
-    }
-    
-    
-    returnAllPathsOrdered(index, pastNodes = ""){
-      if(index <= this.allNodes.length){
-        let currentNode = this.allNodes[index];
-        if(currentNode.children.length === 0){
-          this.allPathsOrdered.push(`${pastNodes},${currentNode.key}`);
-        }
-        else{
-          currentNode.children.forEach(e => {
-            this.returnAllPathsOrdered(e, `${pastNodes === "" ? "" : pastNodes + ","}${currentNode.key}`);
-          });
-        }
-      }
-    }
-}
+
 
 let tree = new gameTree();
 tree.addNode(1, 0);
@@ -1337,6 +1403,9 @@ tree.addNode(9, 3);
 tree.returnAllPathsOrdered(0);
 console.log(tree.allPathsOrdered);
 console.log(tree.pathToRoot(8));
+
+tree.bundle();
+console.log(tree.allNodesDepthOrganized);
 
 
 /*1

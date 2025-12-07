@@ -61,8 +61,7 @@ body{
   left: 20px;
   right: 20px;
   background-color: gray;
-  overflow-y: auto;
-  overflow-x: auto;
+  overflow: auto;
   border-radius: 5px;
   border: solid 2px black;
 }
@@ -135,20 +134,27 @@ body{
 </style>
 </head>
 <div id="file-loading-page" class="file-loading-page">
-<div class="gameList">
-list
+  <div class="gameList">
+    list
+  </div>
 </div>
+<div id="file-loading-page" class="file-loading-page">
+  <div style="overflow: auto;">
+    <svg width="1000" height="1000">
+      <rect x="10" y="10" width="500" height="900" stroke="black" stroke-width="5" fill="none"/>
+    </svg>
+  </div>
 </div>
 <div class="control-container round">
-<input class="gameFlowInput round" type="text"/>
-<button class="run round">run</button>
-<button class="back round">←</button>
+  <input class="gameFlowInput round" type="text"/>
+  <button class="run round">run</button>
+  <button class="back round">←</button>
 </div>
 <!--<input class="input" type="text"/>-->
 <div class="control-container round">
-<button id="populate" class="input round">populate</button>
-<button id="saved-games" class="input round">saved games</button>
-<button id="save" class="inputt round">save</button>
+  <button id="populate" class="input round">populate</button>
+  <button id="saved-games" class="input round">saved games</button>
+  <button id="save" class="inputt round">save</button>
 </div>
 <div class="grid">
 <div id="a00" class="white"></div>
