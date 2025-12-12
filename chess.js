@@ -11,6 +11,7 @@ class gameTree{
         this.allNodesDepthOrganized = [];
         this.maxNodeExtractor = [];
         this.writeCurser = {lastNodeIndex: 0};
+        this.maxWith = {value: 0, index: -1};
     }
     
     addNode(value, parentIndex){
@@ -18,7 +19,8 @@ class gameTree{
         let newNode = {
           parent: -1,
           key: value,
-          children: []
+          children: [],
+          selfIndex: this.allNodes.length
         };
         
         (this.allNodes).push(newNode);
@@ -30,7 +32,8 @@ class gameTree{
           let newNode = {
           parent: parentIndex,
           key: value,
-          children: []
+          children: [],
+          index: this.allNodes.length
           };
           
           this.allNodes.push(newNode);
@@ -126,6 +129,7 @@ class gameTree{
     }
     
     bundle(){
+      this.allNodesDepthOrganized = [];
       for(let i=0; i<this.findMaxDepth(); i++){
         this.allNodesDepthOrganized.push([]);
       }
@@ -143,6 +147,67 @@ class gameTree{
       }
       
     }
+    
+  findMaxWidth(Arr = this.allNodes){
+    if(Arr.length > 0){
+      let max = {value: (Arr[0]).length, index: 0};
+      Arr.forEach((e, i) => {
+        max = e.length > max ? {value: (e).length, index: i} : max;
+      });
+      this.maxWith = max;
+    }
+    else{
+      this.maxWith = {value: 0, index: -1};
+    }
+    
+  }
+    
+}
+
+document.querySelector("#game-tree-display").style.display = "none";
+document.querySelector("#game-tree").onclick = () => {
+  document.querySelector("#game-tree-display").style.display = "flex";
+  gameTreeGUIGenerator();
+};
+
+document.querySelector("#game-tree-display-close").onclick = () => {
+  document.querySelector("#game-tree-display").style.display = "none";
+  document.querySelector("#diagram-svg").innerHTML = "";
+};
+
+function gameTreeGUIGenerator(){
+  let svg = document.querySelector("#diagram-svg");
+  
+  mainGameTree.bundle();
+  mainGameTree.findMaxWidth();
+  
+  svg.setAttribute("height", mainGameTree.allNodesDepthOrganized.length * 50 + 400);
+  svg.setAttribute("width", mainGameTree.maxWith.value * 50 + 400);
+  svg.style.height = mainGameTree.allNodesDepthOrganized.length * 50 + 400;
+  svg.style.width = mainGameTree.maxWith.value * 50 + 400;
+  
+  mainGameTree.allNodesDepthOrganized.forEach((l, i) => {
+    var counter = 0;
+    
+    l.forEach((e, j) => {
+      svg.innerHTML += `
+        <text id="treeNode${e.selfIndex}" x="${(j + 1) * 50}" y="${(i + 1) * 50}" font-size="10" fill="black">
+          ${e.key}
+        </text>`;
+      e.children.forEach((element, index) => {
+        svg.innerHTML += `
+          <line x1="${(j + 1) * 50 + 10}" y1="${(i + 1) * 50 + 5}" x2="${(counter + 1) * 50 + 10}" y2="${(i + 1 + 1) * 50 - 15}" stroke-width="2" stroke="black" />`;
+          counter++;
+      });
+    });
+  });
+  
+  mainGameTree.allNodes.forEach((e, i) => {
+    document.querySelector(`#treeNode${i}`).style.pointerEvents = "auto";
+    document.querySelector(`#treeNode${i}`).onclick = () => {
+      console.log('yes');
+    };
+  });
 }
 
 let displayGrid = [
@@ -1054,10 +1119,37 @@ document.querySelector('#saved-games').onclick = () => {
         return e.split("@");
       })
       
-      fileContent.forEach((e, i) => {
-        document.querySelector("#file-loading-page").innerHTML += `<div id="listElement${i+1}" class="gameListnew">${i + 1})${e[1]} ${e[0]}</div>`;
-        document.querySelector("#listElement" + String(i + 1)).onclick = () => gameLoading(e[0]); 
-      });
+      document.querySelector("#file-loading-page").innerHTML += `
+        <button id="file-loading-page-close" style="font-size: 3vh; background-color: gray">×</button>
+        `;
+      
+      for(let i=0; i<fileContent.length; i++){
+        document.querySelector("#file-loading-page").innerHTML += `<div id="listElement${i+1}" class="gameListnew">
+          <p>
+            ${i + 1})${fileContent[i][1]} ${fileContent[i][0]}
+          </p>
+          <button id="listElementButton${i+1}">run</button>
+        </div>`;
+      }
+      
+      for(let i=0; i<fileContent.length; i++){
+        document.querySelector("#listElementButton" + `${i + 1}`).onclick = () => gameLoading(fileContent[i][0]);
+      }
+      
+      document.querySelector("#file-loading-page-close").onclick = () => {
+        document.querySelector("#file-loading-page").style.display = "none";
+        document.querySelector("#file-loading-page").innerHTML = "";
+      };
+      
+      /*fileContent.forEach((e, i) => {
+        document.querySelector("#file-loading-page").innerHTML += `<div id="listElement${i+1}" class="gameListnew">
+          <p>
+            ${i + 1})${e[1]} ${e[0]}
+          </p>
+          <button id="listElementButton${i+1}">run</button>
+        </div>`;
+        document.querySelector("#listElementButton" + `${i + 1}`).onclick = () => gameLoading(e[0]); 
+      });*/
       document.querySelector("#file-loading-page").style.display = "flex";
     }
     
@@ -1176,6 +1268,7 @@ document.querySelector('.back').onclick = () => {
 }
 
 function gameLoading(gameJSON){
+  console.log("run");
   let gameString = JSON.parse(gameJSON);
   
   gameString.forEach(e => {

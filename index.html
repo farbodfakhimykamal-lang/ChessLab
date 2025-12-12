@@ -5,6 +5,7 @@
 <script type="module" src="./classes/king.js"></script>
 <script type="module" src="./classes/knight.js"></script>-->
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
 body{
   padding: 0;
@@ -135,16 +136,18 @@ body{
 </head>
 <div id="file-loading-page" class="file-loading-page">
   <div class="gameList">
-    list
   </div>
 </div>
-<div id="file-loading-page" class="file-loading-page">
+
+<div id="game-tree-display" class="file-loading-page">
+  <button id="game-tree-display-close" style="font-size: 3vh; background-color: gray">×</button>
   <div style="overflow: auto;">
-    <svg width="1000" height="1000">
-      <rect x="10" y="10" width="500" height="900" stroke="black" stroke-width="5" fill="none"/>
+    <svg id="diagram-svg">
+      
     </svg>
   </div>
 </div>
+
 <div class="control-container round">
   <input class="gameFlowInput round" type="text"/>
   <button class="run round">run</button>
@@ -154,6 +157,7 @@ body{
 <div class="control-container round">
   <button id="populate" class="input round">populate</button>
   <button id="saved-games" class="input round">saved games</button>
+  <button id="game-tree" class="input round">game tree</button>
   <button id="save" class="inputt round">save</button>
 </div>
 <div class="grid">
