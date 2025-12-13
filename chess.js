@@ -29,19 +29,32 @@ class gameTree{
         if((0 <= parentIndex) 
         && (parentIndex <= this.allNodes.length)){
           
-          let newNode = {
-          parent: parentIndex,
-          key: value,
-          children: [],
-          index: this.allNodes.length
-          };
+          var nodeIsFound = {yes: false, index: undefined};
+          (this.allNodes[parentIndex]).children.forEach((e) => {
+            if((this.allNodes[e]).key === value){
+              nodeIsFound.yes = true;
+              nodeIsFound.index = e;
+            }
+          });
           
-          this.allNodes.push(newNode);
-          
-          (this.allNodes[parentIndex]).children.push(this.allNodes.length - 1);
-          
-          this.writeCurser.lastNodeIndex = this.allNodes.length - 1;
-          this.allPathsOrdered = [];
+          if(!nodeIsFound.yes){
+            let newNode = {
+            parent: parentIndex,
+            key: value,
+            children: [],
+            selfIndex: this.allNodes.length
+            };
+            
+            this.allNodes.push(newNode);
+            
+            (this.allNodes[parentIndex]).children.push(this.allNodes.length - 1);
+            
+            this.writeCurser.lastNodeIndex = this.allNodes.length - 1;
+            this.allPathsOrdered = [];
+          }
+          else{
+            this.writeCurser.lastNodeIndex = nodeIsFound.index;
+          }
         }
       }
     }
@@ -190,8 +203,9 @@ function gameTreeGUIGenerator(){
     var counter = 0;
     
     l.forEach((e, j) => {
+      //console.log(`treeNode${e.selfIndex}`);
       svg.innerHTML += `
-        <text id="treeNode${e.selfIndex}" x="${(j + 1) * 50}" y="${(i + 1) * 50}" font-size="10" fill="black">
+        <text id="treeNode${e.selfIndex}" x="${(j + 1) * 50}" y="${(i + 1) * 50}" font-size="10" fill="${mainGameTree.writeCurser.lastNodeIndex === e.selfIndex ? 'yellow' : 'black'}">
           ${e.key}
         </text>`;
       e.children.forEach((element, index) => {
@@ -203,11 +217,58 @@ function gameTreeGUIGenerator(){
   });
   
   mainGameTree.allNodes.forEach((e, i) => {
-    document.querySelector(`#treeNode${i}`).style.pointerEvents = "auto";
-    document.querySelector(`#treeNode${i}`).onclick = () => {
-      console.log('yes');
-    };
+    //console.log(document.querySelector(`#treeNode${i}`));
+    if(document.querySelector(`#treeNode${i}`)){
+      document.querySelector(`#treeNode${i}`).style.pointerEvents = "auto";
+      document.querySelector(`#treeNode${i}`).onclick = () => {
+        console.log('yes');
+        //console.log(mainGameTree.pathToRoot(i));
+        var desiredPath = mainGameTree.pathToRoot(i);
+        var currentPath = mainGameTree.pathToRoot(mainGameTree.writeCurser.lastNodeIndex);
+        treeMoveResolve(currentPath, desiredPath);
+      };
+    }
   });
+}
+
+function treeMoveResolve(currentPath, desiredPath){
+  var cPath = currentPath.split(",");
+  var dPath = desiredPath.split(",");
+  var branchingIndex = 0;
+  var backCount = 0;
+  
+  var minLength = 0;//Math.min(cPath.length, dPath.length);
+  if(dPath.length <= cPath.length){
+    minLength = dPath.length;
+    for(let i=0; i<minLength; i++){
+      if(cPath[i] !== dPath[i]){
+        branchingIndex = i - 1;
+        backCount = cPath.length - (i);
+        break;
+      }
+    }
+  }
+  else{
+    minLength = cPath.length;
+    for(let i=0; i<minLength; i++){
+      if(cPath[i] !== dPath[i]){
+        branchingIndex = i - 1;
+        backCount = cPath.length - (i);
+        break;
+      }
+    }
+  }
+  
+  for(let i=0; i<backCount; i++){
+    backFunc();
+  }
+  for(let i=branchingIndex+1; i<dPath.length; i++){
+    gameFlowAutomation(dPath[i]);
+  }
+  console.log(dPath[branchingIndex+1]);
+  
+  document.querySelector("#game-tree-display").style.display = "none";
+  document.querySelector("#diagram-svg").innerHTML = "";
 }
 
 let displayGrid = [
@@ -1173,7 +1234,8 @@ document.querySelector('.run').onclick = () => {
   });
 }
 
-document.querySelector('.back').onclick = () => {
+document.querySelector('.back').onclick =() => backFunc();
+let backFunc = () => {
   if(gameFlowMovesReversable.length !== 0){
     let l = gameFlowMovesReversable.length - 1;
     let classMap = {
@@ -1482,7 +1544,7 @@ console.log(`${d.getFullYear()}-${d.getMonth()}-${d.getDay()}  ${d.getHours()}:$
 
 
 
-let tree = new gameTree();
+/*let tree = new gameTree();
 tree.addNode(1, 0);
 tree.addNode(2, 0);
 tree.addNode(3, 0);
@@ -1499,7 +1561,7 @@ console.log(tree.pathToRoot(8));
 
 tree.bundle();
 console.log(tree.allNodesDepthOrganized);
-
+*/
 
 /*1
 2       3       4
