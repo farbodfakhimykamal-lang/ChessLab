@@ -246,12 +246,22 @@ function treeMoveResolve(currentPath, desiredPath){
         backCount = cPath.length - (i);
         break;
       }
+      else if(i === minLength - 1){
+        branchingIndex = i - 1;
+        backCount = cPath.length - (i);
+        break;
+      }
     }
   }
   else{
     minLength = cPath.length;
     for(let i=0; i<minLength; i++){
       if(cPath[i] !== dPath[i]){
+        branchingIndex = i - 1;
+        backCount = cPath.length - (i);
+        break;
+      }
+      else if(i === minLength - 1){
         branchingIndex = i - 1;
         backCount = cPath.length - (i);
         break;
@@ -270,6 +280,8 @@ function treeMoveResolve(currentPath, desiredPath){
   document.querySelector("#game-tree-display").style.display = "none";
   document.querySelector("#diagram-svg").innerHTML = "";
 }
+
+let displayIsFliped = false;
 
 let displayGrid = [
   ["r", "k", "b", "l", "q", "b", "k", "r"],
@@ -294,6 +306,24 @@ export let pieceGrid = [
   ];
 let kingCordinates = {black: {x: 7, y: 3},
                       white: {x: 0, y: 3}};
+ 
+function rookSearch(Grid, color){
+  let output = [];
+  
+  for(let i=0; i<Grid.length; i++){
+    for(let j=0; j<(Grid[i]).length; j++){
+      if(Grid[i][j] !== "0"){
+        if((Grid[i][j]).constructor.name === "rook"){
+          if((Grid[i][j]).color === color){
+            output.push(structuredClone(Grid[i][j]));
+          }
+        }
+      }
+    }
+  }
+  
+  return output;
+}
  
 function checkUpdator(){
   pieceGrid.forEach((l, i) => {
@@ -980,7 +1010,6 @@ function gameFlow(){
 function gameFlowAutomation(inputt){
   moveUpdator();
   checkUpdator();
-  
   let turn = "white";
   if(gameFlowMoves.length !== 0){
     let element = gameFlowMoves[gameFlowMoves.length - 1];
@@ -1025,35 +1054,92 @@ function gameFlowAutomation(inputt){
         gameFlowMoves.push(input);
         gameFlowMovesRaw.push(inputt);
         mainGameTree.addNode(inputt, mainGameTree.writeCurser.lastNodeIndex);
+        let kingyWhite = kingCordinatesSearch(pieceGrid, "white");
+        let kingyBlack = kingCordinatesSearch(pieceGrid, "black");
+        let rookyWhite = rookSearch(pieceGrid, "white");
+        let rookyBlack = rookSearch(pieceGrid, "black");
+        
+        let reverseInfo = {
+          white: {
+            king:{
+              x: kingyWhite.x,
+              y: kingyWhite.y,
+              hasBeenChecked: (pieceGrid[kingyWhite.x][kingyWhite.y]).hasBeenChecked,
+              hasMoveBefore: (pieceGrid[kingyWhite.x][kingyWhite.y]).hasMoveBefore
+            },
+            
+            firstRook: rookyWhite[0] !== undefined ? {
+              x: rookyWhite[0].x,
+              y: rookyWhite[0].y,
+              hasMoveBefore: (rookyWhite).hasMoveBefore
+            } : undefined,
+            
+            secondRook: rookyWhite[1] !== undefined ? {
+              x: rookyWhite[1].x,
+              y: rookyWhite[1].y,
+              hasMoveBefore: (rookyWhite[1]).hasMoveBefore
+            } : undefined
+          },
+          
+          black: {
+            king:{
+              x: kingyBlack.x,
+              y: kingyBlack.y,
+              hasBeenChecked: (pieceGrid[kingyBlack.x][kingyBlack.y]).hasBeenChecked,
+              hasMoveBefore: (pieceGrid[kingyBlack.x][kingyBlack.y]).hasMoveBefore
+            },
+            
+            firstRook: rookyBlack[0] !== undefined ? {
+              x: rookyBlack[0].x,
+              y: rookyBlack[0].y,
+              hasMoveBefore: (rookyBlack[0]).hasMoveBefore
+            } : undefined,
+            
+            secondRook: rookyBlack[1] !== undefined ? {
+              x: rookyBlack[1].x,
+              y: rookyBlack[1].y,
+              hasMoveBefore: (rookyBlack[1]).hasMoveBefore
+            } : undefined
+          }
+        };
         
         if(isOpen(pieceGrid, input[2], input[3])){
           if((pieceGrid[input[0]][input[1]]).constructor.name === "pawn"){
-            gameFlowMovesReversable.push(([((pieceGrid[input[0]][input[1]]).move(input[2], input[3])).type]).concat(input));
+            gameFlowMovesReversable.push(([((pieceGrid[input[0]][input[1]]).move(input[2], input[3])).type]).concat(input).concat(reverseInfo));
           }
           
           else if((pieceGrid[input[0]][input[1]]).constructor.name === "king"){
             let moveObj = (pieceGrid[input[0]][input[1]]).move(input[2], input[3]);
-            gameFlowMovesReversable.push(([moveObj.type]).concat(input));
+            gameFlowMovesReversable.push(([moveObj.type]).concat(input).concat(reverseInfo));
           }
           else{
             (pieceGrid[input[0]][input[1]]).move(input[2], input[3]);
-            gameFlowMovesReversable.push((["m"]).concat(input));
+            gameFlowMovesReversable.push((["m"]).concat(input).concat(reverseInfo));
           }
         }
         else{
           if((pieceGrid[input[0]][input[1]]).constructor.name === "pawn"){
-            gameFlowMovesReversable.push(([((pieceGrid[input[0]][input[1]]).take(input[2], input[3])).type, (pieceGrid[input[2]][input[3]]).constructor.name]).concat(input));
+            let placeHolder = (pieceGrid[input[2]][input[3]]).constructor.name;
+            gameFlowMovesReversable.push(([((pieceGrid[input[0]][input[1]]).take(input[2], input[3])).type, placeHolder]).concat(input).concat(reverseInfo));
           }
           else{
-            gameFlowMovesReversable.push((["a", (pieceGrid[input[2]][input[3]]).constructor.name]).concat(input));
+            gameFlowMovesReversable.push((["a", (pieceGrid[input[2]][input[3]]).constructor.name]).concat(input).concat(reverseInfo));
             (pieceGrid[input[0]][input[1]]).take(input[2], input[3]);
             
           }
         }
         
-        boardDisplayUpdator();
-        printBoard();
-        htmlBoardImageAdjuster(htmlGrid, pieceGrid);
+        if(!displayIsFliped){
+          boardDisplayUpdator();
+          printBoard();
+          htmlBoardImageAdjuster(htmlGrid, pieceGrid);
+        }
+        else{
+          boardDisplayUpdator();
+          printBoard();
+          htmlBoardImageAdjusterFliped(htmlGrid, pieceGrid);
+        }
+        
         console.log("Done");
         if(checkTester("white")){
           console.log("Check: white");
@@ -1132,6 +1218,30 @@ document.querySelector('#populate').onclick = () => {
   //console.log(pieceGrid);
   //gameFlow();
   document.querySelector(".gameFlowInput").value = JSON.stringify(gameFlowMovesRaw, null, 2);
+}
+
+document.querySelector('#flip').onclick = () => {
+  
+  displayIsFliped = displayIsFliped ? false : true;
+  
+  if(!displayIsFliped){
+    boardDisplayUpdator();
+    printBoard();
+    htmlBoardClickHook(htmlGrid);
+  
+    htmlBoardImageAdjuster(htmlGrid, pieceGrid);
+  }
+  else{
+    boardDisplayUpdator();
+    printBoard();
+    htmlBoardClickHookFliped(htmlGrid);
+  
+    htmlBoardImageAdjusterFliped(htmlGrid, pieceGrid);
+    transitionHandle = {handle: undefined};
+  }
+  
+  
+  console.log("flipped")
 }
 
 document.querySelector('#save').onclick = () => {
@@ -1234,6 +1344,28 @@ document.querySelector('.run').onclick = () => {
   });
 }
 
+function backUtilReverseInfo(reverseInfo){
+        (pieceGrid[(reverseInfo).white.king.x][(reverseInfo).white.king.y]).hasBeenChecked = (reverseInfo).white.king.hasBeenChecked;
+        (pieceGrid[(reverseInfo).white.king.x][(reverseInfo).white.king.y]).hasMoveBefore = (reverseInfo).white.king.hasMoveBefore;
+        
+        (pieceGrid[(reverseInfo).black.king.x][(reverseInfo).black.king.y]).hasBeenChecked = (reverseInfo).black.king.hasBeenChecked;
+        (pieceGrid[(reverseInfo).black.king.x][(reverseInfo).black.king.y]).hasMoveBefore = (reverseInfo).black.king.hasMoveBefore;
+        
+        if((reverseInfo).white.firstRook){
+        (pieceGrid[(reverseInfo).white.firstRook.x][(reverseInfo).white.firstRook.y]).hasMoveBefore = (reverseInfo).white.firstRook.hasMoveBefore;
+        }
+        if((reverseInfo).white.secondRook){
+        (pieceGrid[(reverseInfo).white.secondRook.x][(reverseInfo).white.secondRook.y]).hasMoveBefore = (reverseInfo).white.secondRook.hasMoveBefore;
+        }
+        
+        if((reverseInfo).black.firstRook){
+        (pieceGrid[(reverseInfo).black.firstRook.x][(reverseInfo).black.firstRook.y]).hasMoveBefore = (reverseInfo).black.firstRook.hasMoveBefore;
+        }
+        if((reverseInfo).black.secondRook){
+        (pieceGrid[(reverseInfo).black.secondRook.x][(reverseInfo).black.secondRook.y]).hasMoveBefore = (reverseInfo).black.secondRook.hasMoveBefore;
+        }
+}
+
 document.querySelector('.back').onclick =() => backFunc();
 let backFunc = () => {
   if(gameFlowMovesReversable.length !== 0){
@@ -1255,6 +1387,9 @@ let backFunc = () => {
         pieceGrid[info[1]][info[2]] = new classMap[(pieceGrid[info[3]][info[4]]).constructor.name](info[1], info[2], info[5]);
         pieceGrid[info[3]][info[4]] = "0";
         
+        backUtilReverseInfo(info[6]);
+        let reverseInfo = info[6];
+        
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
         gameFlowMoves.splice(l, 1);
@@ -1263,12 +1398,15 @@ let backFunc = () => {
         boardDisplayUpdator();
         printBoard();
         htmlBoardImageAdjuster(htmlGrid, pieceGrid);
+        console.log(reverseInfo);
         console.log("Back");
         break;
         
       case "a":
         pieceGrid[info[2]][info[3]] = new classMap[(pieceGrid[info[4]][info[5]]).constructor.name](info[2], info[3], info[6]);
         pieceGrid[info[4]][info[5]] = new classMap[info[1]](info[4], info[5], info[6] === "black" ? "white" : "black");
+        
+        backUtilReverseInfo(info[7]);
         
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
@@ -1283,6 +1421,8 @@ let backFunc = () => {
         
       case "c":
         castleBackHandle(info);
+        
+        backUtilReverseInfo(info[6]);
         
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
@@ -1299,6 +1439,8 @@ let backFunc = () => {
         pieceGrid[info[1]][info[2]] = new classMap["pawn"](info[1], info[2], info[5]);
         pieceGrid[info[3]][info[4]] = "0";
         
+        backUtilReverseInfo(info[6]);
+        
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
         gameFlowMoves.splice(l, 1);
@@ -1313,6 +1455,8 @@ let backFunc = () => {
       case "at":
         pieceGrid[info[2]][info[3]] = new classMap["pawn"](info[2], info[3], info[6]);
         pieceGrid[info[4]][info[5]] = new classMap[info[1]](info[4], info[5], info[6] === "black" ? "white" : "black");
+        
+        backUtilReverseInfo(info[7]);
         
         gameFlowMovesReversable.splice(l, 1);
         gameFlowMovesRaw.splice(l, 1);
@@ -1427,7 +1571,9 @@ let transitionHandle = {handle: undefined};
 function transitionFunc(cords, handleObj){
   if(!handleObj.handle){
     console.log(handleObj.handle);
-    handleObj.handle = {x: cords.x, y: cords.y};
+    if(pieceGrid[cords.x][cords.y] !== "0"){
+      handleObj.handle = {x: cords.x, y: cords.y};
+    }
     console.log(cords.x, cords.y);
   }
   else{
@@ -1470,14 +1616,97 @@ function  htmlBoardImageAdjuster(grid, jsPieceGrid){
   
 }
 
-function  htmlBoardClickHook(grid){
+let eventFunctions = [];
+
+function removeBoardEventListeners(grid, funcGrid){
   grid.forEach((l, i) => {
     l.forEach((e, j) => {
-      e.addEventListener('click', event => {
-        transitionFunc({x: i, y: j}, transitionHandle);
-      });
+      e.removeEventListener('click', funcGrid[i][j]);
     });
   });
+}
+
+function  htmlBoardImageAdjusterFliped(grid, jsPieceGrid){
+  grid.forEach((l, i) => {
+    l.forEach((e, j) => {
+      if(jsPieceGrid[7 - i][7 - j] === "0"){
+        e.innerHTML = "";
+      }
+      else{
+        switch((jsPieceGrid[7 - i][7 - j]).constructor.name){
+          case "king":
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[7 - i][7 - j]).color}-king.png" style="height: 11vw;width: 11vw;" />`;
+            break;
+          case "queen":
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[7 - i][7 - j]).color}-queen.png" style="height: 11vw;width: 11vw;" />`;
+            break;
+          case "knight":
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[7 - i][7 - j]).color}-knight.png" style="height: 11vw;width: 11vw;" />`;
+            break;
+          case "bishop":
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[7 - i][7 - j]).color}-bishop.png" style="height: 11vw;width: 11vw;" />`;
+            break;
+          case "rook":
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[7 - i][7 - j]).color}-rook.png" style="height: 11vw;width: 11vw;" />`;
+            break;
+          case "pawn":
+            e.innerHTML = `<img src="./icons/${(jsPieceGrid[7 - i][7 - j]).color}-pawn.png" style="height: 11vw;width: 11vw;" />`;
+            break;
+        }
+      }
+    });
+  });
+  
+  
+}
+
+function  htmlBoardClickHook(grid){
+  if(eventFunctions.length !== 0){
+    removeBoardEventListeners(htmlGrid, eventFunctions);
+    eventFunctions = [];
+  }
+  
+  if(eventFunctions.length === 0){
+    let line = [];
+    grid.forEach((l, i) => {
+      l.forEach((e, j) => {
+        let func = () => {
+          transitionFunc({x: i, y: j}, transitionHandle);
+        };
+        
+        e.addEventListener('click', func);
+        line.push(func);
+      });
+      
+      eventFunctions.push(line);
+      line = [];
+    });
+  }
+}
+
+function  htmlBoardClickHookFliped(grid){
+  if(eventFunctions.length !== 0){
+    removeBoardEventListeners(htmlGrid, eventFunctions);
+    eventFunctions = [];
+  }
+  
+  if(eventFunctions.length === 0){
+    let line = [];
+    grid.forEach((l, i) => {
+      l.forEach((e, j) => {
+        let func = () => {
+          transitionFunc({x: 7 - i, y: 7 - j}, transitionHandle);
+        };
+        
+        e.addEventListener('click', func);
+        line.push(func);
+      });
+      
+      eventFunctions.push(line);
+      line = [];
+    });
+    
+  }
 }
 
 let htmlGrid = htmlBoardGraber();
